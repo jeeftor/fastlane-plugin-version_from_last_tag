@@ -3,6 +3,46 @@ module Fastlane
     class VersionFromLastTagAction < Action
       def self.run(params)
         UI.message("The version_from_last_tag plugin is working!")
+        version_to_return = "#{params[:default_version]}"
+        regex = "#{params[:regex]}"
+
+        # If there are remotes fetch tags
+        remote_count = sh("git remote show | wc -l")
+        puts "Detected #{remote_count}"
+        puts remote_count.to_i > 0
+
+        if remote_count.to_i > 0
+          sh("git fetch --tags")
+        else
+          puts "Not fetching tags"
+        end
+
+        # Count the tags
+        tag_count = sh("git show-ref --tags | wc -l")
+
+        # If we have more than 1 tag try to parse
+        if tag_count.to_i > 0
+          last_tag = sh("git describe --tags `git rev-list --tags --max-count=1`")
+          begin
+            UI.message("Running [" + last_tag.chomp + "]")
+            UI.message("With regex [" + regex + "]")
+            result = /#{regex}/.match(last_tag.chomp)[1]
+            if result != ""
+              UI.message("Match")
+              version_to_return = result
+            else
+              UI.message("No Match")
+            end
+          rescue
+            UI.message("Regex Failure")
+            # do nothing in the regex error case
+          end
+        end
+
+        UI.message("Parsed tag #{version_to_return} 📝.".green)
+        #Actions.lane_context[SharedValues::VERSION_FROM_LAST_TAG] = version_to_return
+
+        return version_to_return
       end
 
       def self.description
@@ -27,7 +67,7 @@ module Fastlane
                                          description: "Custom Regex for tag parsing ",
                                          optional: true,
                                          type: String, # true: verifies the input is a string, false: every kind of value
-                                         default_value: "^\\D?([\\.0-9]*)",
+                                         default_value: "^\\D*([\\.0-9]*)",
                                          ),
             FastlaneCore::ConfigItem.new(key: :default_version,
                                          env_name: "FL_VERSION_FROM_LAST_TAG_DEFAULT_VERSION",

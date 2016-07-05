@@ -14,7 +14,12 @@ fastlane add_plugin version_from_last_tag
 
 Perform a regex on last (latest) git tag and perform a regex to extract a version number such as Release 1.2.3
 
-This action requires that a repo have a remote set - as part of the process is to fetch the latest tag set.  It was initially designed for cases where a repo was shallow cloned, however it works perfectly well with full repos as well.  The command will try to fetch the last branch tag entry and try to parse it using a regex. The default regex format is `^\\D+([\\.0-9]*)`
+This action requires that a repo have a remote set - as part of the process is to fetch the latest tag set.  It was initially designed for cases where a repo was shallow cloned, however it works perfectly well with full repos as well.  The command will try to fetch the last branch tag entry and try to parse it using a regex. The default regex format is
+
+
+ ```regex
+^\\D*([\\.0-9]*)
+ ```
 
 It will look for a sequence of non-digets and then at the first digit it will capture 
 any of the following characters:    `0 1 2 3 4 5 6 7 8 9 .`
