@@ -46,7 +46,7 @@ module Fastlane
       end
 
       def self.description
-        "Perform a regex on last (latest) git tag and perform a regex to extract a version number such as Release 1.2.3"
+        "Perform a regex on last (latest) git tag and perform a regex to extract a version number such as Release 1.2.3.  Useful when working with a Git-Flow development scheme"
       end
 
       def self.authors
